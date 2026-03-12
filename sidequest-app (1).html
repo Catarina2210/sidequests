@@ -1,0 +1,1236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SideQuest — Daily Real-World Adventures</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --gold:#E8B84B;--gold2:#F5CC6E;--gold-dk:#B8902A;--gold-glow:rgba(232,184,75,0.25);
+  --bg:#0C0C0F;--surface:#15151A;--surface2:#1C1C24;--surface3:#23232E;
+  --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.13);
+  --text:#F2F0EA;--muted:#7A7880;--muted2:#5A5860;
+  --easy:#4CAF79;--easy-bg:rgba(76,175,121,0.15);
+  --inter:#4A9EE8;--inter-bg:rgba(74,158,232,0.15);
+  --hard:#E8844A;--hard-bg:rgba(232,132,74,0.15);
+  --super:#C84E8A;--super-bg:rgba(200,78,138,0.15);
+  --red:#E85050;--green:#4CAF79;
+  --r-sm:10px;--r-md:14px;--r-lg:20px;--r-xl:28px;
+}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;overflow:hidden}
+
+/* ── AUTH SCREENS ── */
+.auth-shell{display:flex;flex-direction:column;height:100vh;max-width:420px;margin:0 auto;background:var(--bg);overflow-y:auto;padding:0 24px 40px}
+.auth-logo{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:4px;color:var(--gold);text-align:center;margin-bottom:4px;text-shadow:0 0 40px rgba(232,184,75,0.3)}
+.auth-tagline{font-size:13px;font-weight:700;color:var(--muted);text-align:center;letter-spacing:1px;margin-bottom:32px}
+.auth-hero{text-align:center;padding:40px 0 10px}
+.auth-hero-icon{font-size:72px;animation:float 3s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+.auth-tabs{display:flex;background:var(--surface);border-radius:var(--r-lg);padding:4px;margin-bottom:24px;gap:4px}
+.auth-tab{flex:1;padding:11px;border:none;background:none;border-radius:var(--r-md);font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:var(--muted);cursor:pointer;transition:all 0.2s}
+.auth-tab.active{background:var(--gold);color:#0C0C0F}
+.auth-form{display:flex;flex-direction:column;gap:12px}
+.auth-field{display:flex;flex-direction:column;gap:6px}
+.auth-label{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted)}
+.auth-input{background:var(--surface);border:2px solid var(--border2);border-radius:var(--r-md);padding:14px 16px;color:var(--text);font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;outline:none;transition:border-color 0.2s;width:100%}
+.auth-input:focus{border-color:var(--gold)}
+.auth-input::placeholder{color:var(--muted2);font-weight:600}
+.auth-input.error{border-color:var(--red)}
+.auth-btn{background:var(--gold);border:none;border-radius:var(--r-md);padding:16px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;color:#0C0C0F;cursor:pointer;box-shadow:0 4px 0 var(--gold-dk);transition:all 0.15s;margin-top:4px}
+.auth-btn:active{box-shadow:0 2px 0 var(--gold-dk);transform:translateY(2px)}
+.auth-btn:hover{background:var(--gold2)}
+.auth-btn:disabled{opacity:0.5;cursor:not-allowed}
+.auth-divider{display:flex;align-items:center;gap:10px;margin:4px 0}
+.auth-divider::before,.auth-divider::after{content:'';flex:1;height:1px;background:var(--border2)}
+.auth-divider span{font-size:12px;font-weight:700;color:var(--muted)}
+.auth-google{background:var(--surface);border:2px solid var(--border2);border-radius:var(--r-md);padding:14px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all 0.2s}
+.auth-google:hover{border-color:var(--gold);color:var(--gold)}
+.auth-error{background:rgba(232,80,80,0.1);border:1px solid rgba(232,80,80,0.3);border-radius:var(--r-md);padding:10px 14px;font-size:13px;font-weight:700;color:var(--red);display:none}
+.auth-error.visible{display:block}
+.auth-success{background:rgba(76,175,121,0.1);border:1px solid rgba(76,175,121,0.3);border-radius:var(--r-md);padding:10px 14px;font-size:13px;font-weight:700;color:var(--easy);display:none}
+.auth-success.visible{display:block}
+.auth-features{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:24px 0 8px}
+.auth-feat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:14px;text-align:center}
+.auth-feat-icon{font-size:24px;margin-bottom:6px}
+.auth-feat-text{font-size:12px;font-weight:700;color:var(--muted);line-height:1.4}
+.auth-terms{font-size:11px;font-weight:600;color:var(--muted2);text-align:center;line-height:1.6;margin-top:12px}
+.auth-terms a{color:var(--gold);text-decoration:none}
+
+/* ── NOTIF PERMISSION ── */
+.notif-sheet{padding:24px 0 10px}
+.notif-icon{font-size:52px;text-align:center;margin-bottom:12px;animation:bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1)}
+.notif-title{font-size:22px;font-weight:900;text-align:center;margin-bottom:8px}
+.notif-sub{font-size:14px;font-weight:600;color:var(--muted);text-align:center;line-height:1.6;margin-bottom:20px}
+.notif-perks{display:flex;flex-direction:column;gap:10px;margin-bottom:24px}
+.notif-perk{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-md);padding:12px 14px}
+.notif-perk-icon{font-size:22px;flex-shrink:0}
+.notif-perk-text{font-size:13px;font-weight:700;line-height:1.4}
+.notif-perk-sub{font-size:11px;font-weight:600;color:var(--muted);margin-top:2px}
+.notif-email-field{margin-bottom:14px}
+
+/* ── APP SHELL ── */
+.app-shell{display:flex;flex-direction:column;height:100vh;max-width:420px;margin:0 auto;background:var(--bg)}
+.bottom-nav{display:flex;background:var(--surface);border-top:2px solid var(--border2);padding:8px 0 12px;flex-shrink:0}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;transition:transform 0.15s}
+.nav-item:active{transform:scale(0.9)}
+.nav-icon{font-size:22px;transition:filter 0.2s}
+.nav-label{font-size:10px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted)}
+.nav-item.active .nav-label{color:var(--gold)}
+.nav-item.active .nav-icon{filter:drop-shadow(0 0 6px var(--gold))}
+.page{flex:1;overflow-y:auto;overflow-x:hidden;padding:0 16px 20px;display:none}
+.page.active{display:block}
+.page::-webkit-scrollbar{width:3px}
+.page::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 0 12px;position:sticky;top:0;background:var(--bg);z-index:10}
+.logo-text{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:3px;color:var(--gold)}
+.top-stats{display:flex;align-items:center;gap:14px}
+.top-stat{display:flex;align-items:center;gap:5px;font-size:14px;font-weight:800}
+.xp-section{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:16px}
+.xp-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.xp-val{font-size:12px;font-weight:800;color:var(--gold)}
+.xp-track{height:14px;background:var(--surface2);border-radius:99px;overflow:hidden}
+.xp-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--gold-dk),var(--gold2));transition:width 0.8s cubic-bezier(0.34,1.56,0.64,1);position:relative}
+.xp-fill::after{content:'';position:absolute;top:2px;left:8px;right:8px;height:4px;background:rgba(255,255,255,0.3);border-radius:99px}
+.level-badge{display:inline-flex;align-items:center;gap:6px;background:var(--gold-glow);border:1px solid rgba(232,184,75,0.3);border-radius:99px;padding:3px 10px;font-size:12px;font-weight:800;color:var(--gold)}
+.streak-card{background:linear-gradient(135deg,#1C1508,#1A1610);border:2px solid rgba(232,184,75,0.3);border-radius:var(--r-xl);padding:18px;margin-bottom:16px;position:relative;overflow:hidden}
+.streak-card::before{content:'';position:absolute;top:-30px;right:-20px;width:120px;height:120px;background:radial-gradient(circle,rgba(232,184,75,0.12),transparent 70%);pointer-events:none}
+.streak-row{display:flex;align-items:center;justify-content:space-between}
+.streak-num{font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--gold);line-height:1}
+.streak-label{font-size:12px;font-weight:800;color:var(--gold-dk);letter-spacing:1px;text-transform:uppercase}
+.streak-fire{font-size:42px;filter:drop-shadow(0 0 12px rgba(255,140,0,0.6));animation:flicker 2s ease-in-out infinite}
+@keyframes flicker{0%,100%{transform:scale(1) rotate(-2deg)}50%{transform:scale(1.05) rotate(2deg)}}
+.streak-days{display:flex;gap:6px;margin-top:12px}
+.streak-day{flex:1;height:6px;border-radius:99px;background:var(--surface2)}
+.streak-day.done{background:var(--gold);box-shadow:0 0 6px rgba(232,184,75,0.5)}
+.streak-day.today{background:var(--gold2);animation:pulse-day 1.5s ease-in-out infinite}
+@keyframes pulse-day{0%,100%{box-shadow:0 0 6px rgba(232,184,75,0.5)}50%{box-shadow:0 0 14px rgba(232,184,75,0.9)}}
+.new-user-banner{background:linear-gradient(135deg,rgba(232,184,75,0.08),rgba(200,78,138,0.08));border:2px solid rgba(232,184,75,0.2);border-radius:var(--r-xl);padding:20px;margin-bottom:16px;text-align:center}
+.new-user-icon{font-size:36px;margin-bottom:8px}
+.new-user-title{font-size:17px;font-weight:900;margin-bottom:6px}
+.new-user-sub{font-size:13px;font-weight:600;color:var(--muted);line-height:1.5}
+.section-hd{display:flex;align-items:center;justify-content:space-between;margin:20px 0 10px}
+.section-hd h2{font-size:16px;font-weight:900}
+.section-hd a{font-size:12px;font-weight:700;color:var(--gold);text-decoration:none;cursor:pointer}
+.diff-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.diff-card{background:var(--surface);border:2px solid var(--border);border-radius:var(--r-lg);padding:16px 14px;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.diff-card::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;border-radius:var(--r-lg) var(--r-lg) 0 0}
+.diff-card.easy::before{background:var(--easy)}.diff-card.inter::before{background:var(--inter)}.diff-card.hard::before{background:var(--hard)}.diff-card.super::before{background:var(--super)}
+.diff-card:hover,.diff-card.selected{transform:translateY(-2px)}
+.diff-card.selected.easy{border-color:var(--easy);background:var(--easy-bg)}
+.diff-card.selected.inter{border-color:var(--inter);background:var(--inter-bg)}
+.diff-card.selected.hard{border-color:var(--hard);background:var(--hard-bg)}
+.diff-card.selected.super{border-color:var(--super);background:var(--super-bg)}
+.diff-emoji{font-size:28px;margin-bottom:6px}
+.diff-name{font-size:14px;font-weight:900;margin-bottom:2px}
+.diff-name.easy{color:var(--easy)}.diff-name.inter{color:var(--inter)}.diff-name.hard{color:var(--hard)}.diff-name.super{color:var(--super)}
+.diff-pts{font-size:11px;font-weight:700;color:var(--muted)}
+.quest-wrap{margin-bottom:14px}
+.quest-card-main{background:var(--surface);border:2px solid var(--border2);border-radius:var(--r-xl);padding:20px;transition:all 0.3s}
+.quest-card-main.easy{border-color:rgba(76,175,121,0.4)}.quest-card-main.inter{border-color:rgba(74,158,232,0.4)}.quest-card-main.hard{border-color:rgba(232,132,74,0.4)}.quest-card-main.super{border-color:rgba(200,78,138,0.4)}
+.qc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:14px}
+.qc-badge{font-size:11px;font-weight:800;letter-spacing:1px;text-transform:uppercase;padding:5px 10px;border-radius:99px}
+.qc-badge.easy{background:var(--easy-bg);color:var(--easy)}.qc-badge.inter{background:var(--inter-bg);color:var(--inter)}.qc-badge.hard{background:var(--hard-bg);color:var(--hard)}.qc-badge.super{background:var(--super-bg);color:var(--super)}
+.qc-pts{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold)}
+.qc-text{font-size:18px;font-weight:800;line-height:1.35;margin-bottom:14px}
+.qc-bonus{display:flex;align-items:center;gap:8px;background:rgba(232,184,75,0.08);border:1px solid rgba(232,184,75,0.2);border-radius:10px;padding:8px 12px;font-size:12px;font-weight:700;color:var(--gold)}
+.qc-shadow{height:8px;background:var(--surface);border:2px solid var(--border2);border-top:none;border-radius:0 0 var(--r-xl) var(--r-xl);margin:0 8px;opacity:0.6}
+.qc-shadow2{height:6px;background:var(--surface);border:2px solid var(--border2);border-top:none;border-radius:0 0 var(--r-xl) var(--r-xl);margin:0 16px;opacity:0.3}
+.reroll-bar{display:flex;align-items:center;justify-content:space-between;padding:10px 0;margin-bottom:12px}
+.reroll-info{font-size:12px;font-weight:700;color:var(--muted)}
+.hearts{display:flex;gap:6px}
+.heart{font-size:18px;transition:all 0.3s}
+.heart.gone{filter:grayscale(1);opacity:0.3}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:4px}
+.btn{border:none;border-radius:var(--r-md);padding:15px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:900;cursor:pointer;transition:all 0.15s;display:flex;align-items:center;justify-content:center;gap:6px}
+.btn:active{transform:translateY(2px)}
+.btn-primary{background:var(--gold);color:#0C0C0F;box-shadow:0 4px 0 var(--gold-dk)}
+.btn-primary:active{box-shadow:0 2px 0 var(--gold-dk);transform:translateY(2px)}
+.btn-primary:hover{background:var(--gold2)}
+.btn-secondary{background:var(--surface2);color:var(--text);border:2px solid var(--border2);box-shadow:0 4px 0 rgba(0,0,0,0.4)}
+.btn-secondary:active{box-shadow:0 2px 0 rgba(0,0,0,0.4);transform:translateY(2px)}
+.btn-secondary:hover{border-color:var(--gold);color:var(--gold)}
+.btn-full{grid-column:span 2}
+.btn:disabled{opacity:0.35;cursor:not-allowed;transform:none!important;box-shadow:none!important}
+.btn-ghost{background:none;border:none;color:var(--muted);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;text-align:center;padding:10px}
+.btn-ghost:hover{color:var(--gold)}
+.upload-zone{background:var(--surface);border:2px dashed var(--border2);border-radius:var(--r-xl);padding:30px 20px;text-align:center;margin-bottom:14px;cursor:pointer;transition:all 0.2s}
+.upload-zone:hover{border-color:var(--gold)}
+.upload-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.complete-screen{text-align:center;padding:30px 0}
+.confetti-emoji{font-size:56px;animation:bounce-in 0.5s cubic-bezier(0.34,1.56,0.64,1)}
+@keyframes bounce-in{0%{transform:scale(0)}100%{transform:scale(1)}}
+.complete-pts{font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--gold);line-height:1;animation:pts-pop 0.6s 0.2s cubic-bezier(0.34,1.56,0.64,1) both}
+@keyframes pts-pop{0%{transform:scale(0);opacity:0}100%{transform:scale(1);opacity:1}}
+.complete-label{font-size:14px;font-weight:700;color:var(--muted);margin-bottom:20px}
+.complete-breakdown{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:20px;text-align:left}
+.breakdown-row{display:flex;justify-content:space-between;padding:6px 0;font-size:14px;font-weight:700}
+.breakdown-row:not(:last-child){border-bottom:1px solid var(--border)}
+.breakdown-val{color:var(--gold)}
+.lb-filter{display:flex;gap:8px;margin-bottom:16px}
+.lb-tab{flex:1;padding:10px;background:var(--surface);border:2px solid var(--border);border-radius:var(--r-md);font-size:12px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase;color:var(--muted);cursor:pointer;text-align:center;transition:all 0.15s}
+.lb-tab.active{background:var(--gold-glow);border-color:rgba(232,184,75,0.4);color:var(--gold)}
+.lb-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-xl);overflow:hidden;margin-bottom:14px}
+.lb-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border)}
+.lb-row:last-child{border-bottom:none}
+.lb-row.me{background:rgba(232,184,75,0.06)}
+.lb-rank{font-family:'Bebas Neue',sans-serif;font-size:20px;width:28px;text-align:center;color:var(--muted)}
+.lb-rank.r1{color:#FFD700}.lb-rank.r2{color:#C0C0C0}.lb-rank.r3{color:#CD7F32}
+.lb-avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;flex-shrink:0;border:2px solid var(--border2)}
+.lb-info{flex:1;min-width:0}
+.lb-name{font-size:14px;font-weight:800}
+.lb-meta{font-size:11px;font-weight:600;color:var(--muted)}
+.lb-score{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold)}
+.lb-podium{display:flex;align-items:flex-end;justify-content:center;gap:10px;padding:20px 0 10px;margin-bottom:16px}
+.podium-item{display:flex;flex-direction:column;align-items:center;gap:6px}
+.podium-avatar{border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;border:3px solid;width:52px;height:52px}
+.p1 .podium-avatar{width:62px;height:62px;border-color:#FFD700;background:rgba(255,215,0,0.1)}
+.p2 .podium-avatar{border-color:#C0C0C0;background:rgba(192,192,192,0.1)}
+.p3 .podium-avatar{border-color:#CD7F32;background:rgba(205,127,50,0.1)}
+.podium-name{font-size:11px;font-weight:800;color:var(--muted);text-align:center}
+.podium-pts{font-family:'Bebas Neue',sans-serif;font-size:16px;color:var(--gold)}
+.podium-block{border-radius:var(--r-sm) var(--r-sm) 0 0}
+.p1 .podium-block{height:48px;width:72px;background:linear-gradient(to top,#B8902A,var(--gold))}
+.p2 .podium-block{height:36px;width:64px;background:linear-gradient(to top,#888,#CCC)}
+.p3 .podium-block{height:26px;width:64px;background:linear-gradient(to top,#8B5A1A,#CD7F32)}
+.crown{font-size:20px;filter:drop-shadow(0 0 8px rgba(255,215,0,0.8));animation:crown-bounce 2s ease-in-out infinite}
+@keyframes crown-bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px)}}
+.profile-avatar-lg{width:80px;height:80px;border-radius:50%;background:rgba(232,184,75,0.1);border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:36px;margin:0 auto 12px;box-shadow:0 0 20px rgba(232,184,75,0.2)}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.stat-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg);padding:14px 10px;text-align:center}
+.stat-num{font-family:'Bebas Neue',sans-serif;font-size:30px;line-height:1}
+.stat-lbl{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.badges-row{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px}
+.badge-chip{background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:8px 12px;display:flex;align-items:center;gap:6px;font-size:12px;font-weight:800}
+.hist-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
+.hist-icon{font-size:24px}
+.hist-text{flex:1;font-size:13px;font-weight:700;line-height:1.3}
+.hist-meta{font-size:11px;font-weight:600;color:var(--muted);margin-top:2px}
+.hist-pts{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold)}
+.empty-state{text-align:center;padding:40px 20px}
+.empty-icon{font-size:52px;margin-bottom:12px}
+.empty-title{font-size:18px;font-weight:900;margin-bottom:6px}
+.empty-sub{font-size:13px;font-weight:600;color:var(--muted);line-height:1.6}
+.reset-banner{background:linear-gradient(135deg,rgba(200,78,138,0.1),rgba(232,184,75,0.1));border:1px solid rgba(232,184,75,0.2);border-radius:var(--r-lg);padding:12px 14px;display:flex;align-items:center;gap:10px;margin-bottom:16px}
+.reset-text{flex:1;font-size:12px;font-weight:700;color:var(--gold)}
+.reset-days{font-family:'Bebas Neue',sans-serif;font-size:18px;color:var(--gold)}
+.notif-toggle{display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-md);padding:14px 16px;margin-bottom:10px}
+.notif-toggle-info{flex:1}
+.notif-toggle-title{font-size:14px;font-weight:800;margin-bottom:2px}
+.notif-toggle-sub{font-size:11px;font-weight:600;color:var(--muted)}
+.toggle-switch{width:44px;height:24px;background:var(--surface2);border-radius:99px;position:relative;cursor:pointer;transition:background 0.2s;border:2px solid var(--border2);flex-shrink:0}
+.toggle-switch.on{background:var(--gold);border-color:var(--gold)}
+.toggle-knob{position:absolute;top:2px;left:2px;width:16px;height:16px;background:#fff;border-radius:50%;transition:transform 0.2s}
+.toggle-switch.on .toggle-knob{transform:translateX(20px)}
+.tag{display:inline-flex;align-items:center;padding:3px 8px;border-radius:99px;font-size:10px;font-weight:800;letter-spacing:0.5px;text-transform:uppercase}
+.tag-easy{background:var(--easy-bg);color:var(--easy)}.tag-inter{background:var(--inter-bg);color:var(--inter)}.tag-hard{background:var(--hard-bg);color:var(--hard)}.tag-super{background:var(--super-bg);color:var(--super)}.tag-custom{background:rgba(232,184,75,0.15);color:var(--gold)}
+.search-bar{background:var(--surface);border:2px solid var(--border2);border-radius:var(--r-md);padding:10px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;width:100%;outline:none;margin-bottom:12px;transition:border-color 0.2s}
+.search-bar:focus{border-color:var(--gold)}
+.search-bar::placeholder{color:var(--muted);font-weight:600}
+.community-badge{display:inline-flex;align-items:center;gap:4px;background:rgba(232,184,75,0.1);border:1px solid rgba(232,184,75,0.25);border-radius:99px;padding:2px 8px;font-size:10px;font-weight:800;color:var(--gold);margin-left:6px}
+.settings-section{margin-bottom:20px}
+.settings-title{font-size:11px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px}
+.settings-row{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:1px solid var(--border)}
+.settings-row:last-child{border-bottom:none}
+.settings-icon{font-size:20px;width:28px;text-align:center}
+.settings-info{flex:1}
+.settings-label{font-size:14px;font-weight:800}
+.settings-sub{font-size:11px;font-weight:600;color:var(--muted);margin-top:2px}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:100;display:flex;align-items:flex-end;justify-content:center}
+.modal-sheet{background:var(--surface);border-radius:var(--r-xl) var(--r-xl) 0 0;padding:20px 20px 36px;width:100%;max-width:420px;animation:sheet-up 0.3s cubic-bezier(0.34,1.2,0.64,1)}
+@keyframes sheet-up{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:99px;margin:0 auto 20px}
+.form-input{width:100%;background:var(--surface2);border:2px solid var(--border2);border-radius:var(--r-md);padding:13px 14px;color:var(--text);font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;outline:none;transition:border-color 0.2s;resize:none}
+.form-input:focus{border-color:var(--gold)}
+.form-input::placeholder{color:var(--muted2);font-weight:600}
+.form-label{font-size:12px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin-bottom:6px;display:block}
+.ai-dot{width:7px;height:7px;border-radius:50%;background:var(--gold);animation:ai-pulse 1.2s ease-in-out infinite;display:inline-block}
+.ai-dot:nth-child(2){animation-delay:0.2s}.ai-dot:nth-child(3){animation-delay:0.4s}
+@keyframes ai-pulse{0%,100%{opacity:0.3;transform:scale(0.8)}50%{opacity:1;transform:scale(1)}}
+.ai-factor{background:var(--surface2);border-radius:var(--r-sm);padding:8px 10px}
+.ai-factor-label{font-size:10px;font-weight:800;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-bottom:4px}
+.ai-factor-bar{height:6px;background:var(--surface3);border-radius:99px;overflow:hidden}
+.ai-factor-fill{height:100%;border-radius:99px;transition:width 0.8s cubic-bezier(0.34,1.3,0.64,1)}
+.slide-up{animation:slide-up 0.35s cubic-bezier(0.34,1.3,0.64,1) both}
+@keyframes slide-up{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.shake{animation:shake 0.4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+.hidden{display:none!important}
+.notif-status{font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px}
+.notif-status.enabled{background:rgba(76,175,121,0.15);color:var(--easy)}
+.notif-status.disabled{background:var(--surface2);color:var(--muted)}
+.notif-status.pending{background:rgba(232,184,75,0.15);color:var(--gold)}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════════
+     AUTH SCREEN
+════════════════════════════════════════════ -->
+<div class="auth-shell" id="auth-screen">
+  <div class="auth-hero">
+    <div class="auth-hero-icon">⚔️</div>
+  </div>
+  <div class="auth-logo">SIDEQUEST</div>
+  <div class="auth-tagline">Daily adventures. Real world. Real points.</div>
+
+  <div class="auth-tabs">
+    <button class="auth-tab active" onclick="switchAuthTab('login',this)">Log In</button>
+    <button class="auth-tab" onclick="switchAuthTab('signup',this)">Sign Up</button>
+  </div>
+
+  <!-- LOGIN FORM -->
+  <div id="login-form" class="auth-form">
+    <div class="auth-field">
+      <label class="auth-label">Email</label>
+      <input class="auth-input" id="login-email" type="email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">Password</label>
+      <input class="auth-input" id="login-pass" type="password" placeholder="Your password" autocomplete="current-password">
+    </div>
+    <div id="login-error" class="auth-error"></div>
+    <button class="auth-btn" onclick="doLogin()">Log In →</button>
+    <div style="text-align:center;margin-top:4px"><button class="btn-ghost" onclick="">Forgot password?</button></div>
+    <div class="auth-divider"><span>or</span></div>
+    <button class="auth-google" onclick="doGoogleAuth()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+      Continue with Google
+    </button>
+  </div>
+
+  <!-- SIGNUP FORM -->
+  <div id="signup-form" class="auth-form hidden">
+    <div class="auth-features">
+      <div class="auth-feat"><div class="auth-feat-icon">🏆</div><div class="auth-feat-text">Global & national rankings</div></div>
+      <div class="auth-feat"><div class="auth-feat-icon">🔥</div><div class="auth-feat-text">Daily streak rewards</div></div>
+      <div class="auth-feat"><div class="auth-feat-icon">✨</div><div class="auth-feat-text">Create your own quests</div></div>
+      <div class="auth-feat"><div class="auth-feat-icon">📹</div><div class="auth-feat-text">Video proof bonuses</div></div>
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">Username</label>
+      <input class="auth-input" id="signup-name" type="text" placeholder="Choose a username" maxlength="20" autocomplete="username">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">Email</label>
+      <input class="auth-input" id="signup-email" type="email" placeholder="you@example.com" autocomplete="email">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">Password</label>
+      <input class="auth-input" id="signup-pass" type="password" placeholder="Min. 8 characters" autocomplete="new-password">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">Country</label>
+      <select class="auth-input" id="signup-country">
+        <option value="">Select your country…</option>
+        <option value="CA">🇨🇦 Canada</option>
+        <option value="US">🇺🇸 United States</option>
+        <option value="GB">🇬🇧 United Kingdom</option>
+        <option value="AU">🇦🇺 Australia</option>
+        <option value="JP">🇯🇵 Japan</option>
+        <option value="CN">🇨🇳 China</option>
+        <option value="KR">🇰🇷 South Korea</option>
+        <option value="TH">🇹🇭 Thailand</option>
+        <option value="BR">🇧🇷 Brazil</option>
+        <option value="MX">🇲🇽 Mexico</option>
+        <option value="GH">🇬🇭 Ghana</option>
+        <option value="NG">🇳🇬 Nigeria</option>
+        <option value="NO">🇳🇴 Norway</option>
+        <option value="OTHER">🌍 Other</option>
+      </select>
+    </div>
+    <div id="signup-error" class="auth-error"></div>
+    <button class="auth-btn" onclick="doSignup()">Create Account →</button>
+    <div class="auth-divider"><span>or</span></div>
+    <button class="auth-google" onclick="doGoogleAuth()">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+      Sign Up with Google
+    </button>
+    <div class="auth-terms">By signing up you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     NOTIFICATION PERMISSION SCREEN
+════════════════════════════════════════════ -->
+<div class="auth-shell hidden" id="notif-screen">
+  <div class="notif-sheet">
+    <div class="notif-icon">🔔</div>
+    <div class="notif-title">Never Miss a Quest</div>
+    <div class="notif-sub">Get daily reminders, streak alerts, and leaderboard updates so you stay on top of your adventure game.</div>
+    <div class="notif-perks">
+      <div class="notif-perk">
+        <div class="notif-perk-icon">⚔️</div>
+        <div><div class="notif-perk-text">Daily quest reminder</div><div class="notif-perk-sub">Sent every morning at 9am your time</div></div>
+      </div>
+      <div class="notif-perk">
+        <div class="notif-perk-icon">🔥</div>
+        <div><div class="notif-perk-text">Streak protection alert</div><div class="notif-perk-sub">Reminded before midnight if you haven't completed today's quest</div></div>
+      </div>
+      <div class="notif-perk">
+        <div class="notif-perk-icon">🏆</div>
+        <div><div class="notif-perk-text">Ranking updates</div><div class="notif-perk-sub">Notified when someone overtakes you on the leaderboard</div></div>
+      </div>
+    </div>
+    <div style="margin-bottom:14px">
+      <label class="form-label" style="margin-bottom:8px">Email for notifications (backup)</label>
+      <input class="auth-input" id="notif-email" type="email" placeholder="you@example.com" style="width:100%">
+    </div>
+    <button class="auth-btn" style="width:100%;margin-bottom:10px" onclick="enableNotifications()">🔔 Enable Notifications</button>
+    <button class="btn-ghost" style="width:100%" onclick="skipNotifications()">Skip for now</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     MAIN APP
+════════════════════════════════════════════ -->
+<div class="app-shell hidden" id="app-screen">
+
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+    <div class="topbar">
+      <div class="logo-text">SIDEQUEST</div>
+      <div class="top-stats">
+        <div class="top-stat"><span>🔥</span><span id="hd-streak">0</span></div>
+        <div class="top-stat"><span>⚡</span><span id="hd-pts">0</span></div>
+        <div style="width:26px;height:26px;background:var(--gold-glow);border:1px solid rgba(232,184,75,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:var(--gold)" id="hd-level">1</div>
+      </div>
+    </div>
+    <div class="xp-section">
+      <div class="xp-header">
+        <span class="level-badge">⭐ Level <span id="xp-level">1</span></span>
+        <span class="xp-val"><span id="xp-cur">0</span> / <span id="xp-next">100</span> XP</span>
+      </div>
+      <div class="xp-track"><div class="xp-fill" id="xp-bar" style="width:0%"></div></div>
+    </div>
+    <div class="streak-card">
+      <div class="streak-row">
+        <div><div class="streak-num" id="streak-num">0</div><div class="streak-label">Day Streak 🔥</div></div>
+        <div class="streak-fire" id="streak-fire-icon" style="opacity:0.3">🔥</div>
+      </div>
+      <div class="streak-days" id="streak-days"></div>
+    </div>
+    <div id="new-user-banner" class="new-user-banner hidden">
+      <div class="new-user-icon">🗡️</div>
+      <div class="new-user-title">Welcome, Adventurer!</div>
+      <div class="new-user-sub">Your journey starts now. Pick a difficulty below and get your first quest. Complete it and start building your streak!</div>
+    </div>
+    <div class="reset-banner">
+      <div style="font-size:20px">🏆</div>
+      <div class="reset-text">Monthly rankings reset in</div>
+      <div class="reset-days">19 days</div>
+    </div>
+    <div class="section-hd"><h2>Today's Quest</h2></div>
+    <div class="diff-grid">
+      <div class="diff-card easy" onclick="selectDiff('easy')" id="dc-easy"><div class="diff-emoji">🌱</div><div class="diff-name easy">Easy</div><div class="diff-pts">1–30 pts</div></div>
+      <div class="diff-card inter" onclick="selectDiff('inter')" id="dc-inter"><div class="diff-emoji">⚡</div><div class="diff-name inter">Intermediate</div><div class="diff-pts">31–75 pts</div></div>
+      <div class="diff-card hard" onclick="selectDiff('hard')" id="dc-hard"><div class="diff-emoji">🔥</div><div class="diff-name hard">Hard</div><div class="diff-pts">76–150 pts</div></div>
+      <div class="diff-card super" onclick="selectDiff('super')" id="dc-super"><div class="diff-emoji">💀</div><div class="diff-name super">Super Hard</div><div class="diff-pts">151+ pts</div></div>
+    </div>
+    <div id="quest-area" class="hidden slide-up">
+      <div class="quest-wrap">
+        <div class="quest-card-main" id="quest-card">
+          <div class="qc-top"><div class="qc-badge" id="qc-badge">Easy</div><div class="qc-pts" id="qc-pts">+20 pts</div></div>
+          <div class="qc-text" id="qc-text">Loading…</div>
+          <div class="qc-bonus">📹 Film it as video for <strong>+5 bonus pts</strong></div>
+        </div>
+        <div class="qc-shadow"></div><div class="qc-shadow2"></div>
+      </div>
+      <div class="reroll-bar">
+        <div class="reroll-info" id="reroll-info">3 free rerolls left</div>
+        <div class="hearts"><span class="heart" id="h0">❤️</span><span class="heart" id="h1">❤️</span><span class="heart" id="h2">❤️</span></div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" id="btn-reroll" onclick="doReroll()">🔀 Reroll</button>
+        <button class="btn btn-primary" onclick="acceptQuest()">✅ Accept!</button>
+      </div>
+    </div>
+    <div id="submit-area" class="hidden slide-up">
+      <div style="margin-bottom:14px;padding:14px 16px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-lg)">
+        <div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Active quest</div>
+        <div style="font-size:15px;font-weight:800" id="submit-quest-text"></div>
+      </div>
+      <div class="upload-zone">
+        <div style="font-size:44px;margin-bottom:10px">📸</div>
+        <div style="font-size:16px;font-weight:900;margin-bottom:4px">Prove it!</div>
+        <div style="font-size:12px;font-weight:600;color:var(--muted)">Upload proof to earn your points</div>
+        <div class="upload-btns">
+          <button class="btn btn-secondary" onclick="submitProof('photo')">📷 Photo</button>
+          <button class="btn btn-primary" onclick="submitProof('video')">🎬 Video +5</button>
+        </div>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-align:center;line-height:1.6">Submissions reviewed within 24h · Points added after verification</div>
+    </div>
+    <div id="complete-area" class="hidden">
+      <div class="complete-screen">
+        <div class="confetti-emoji">🎉</div>
+        <div class="complete-pts" id="earned-pts">+25</div>
+        <div class="complete-label">points earned!</div>
+        <div class="complete-breakdown">
+          <div class="breakdown-row"><span>Base points</span><span class="breakdown-val" id="bd-base">+20</span></div>
+          <div class="breakdown-row" id="bd-bonus-row"><span>Video bonus</span><span class="breakdown-val">+5</span></div>
+          <div class="breakdown-row"><span>Streak multiplier</span><span class="breakdown-val">×1.0</span></div>
+        </div>
+        <button class="btn btn-primary btn-full" onclick="resetQuest()">🗡️ New Quest Tomorrow</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="page" id="page-rank">
+    <div class="topbar"><div class="logo-text">Rankings</div><div style="font-size:12px;font-weight:800;color:var(--muted)">March 2026</div></div>
+    <div class="lb-podium">
+      <div class="podium-item p2"><div class="podium-avatar" style="border-color:#C0C0C0;background:rgba(192,192,192,0.1)">KA</div><div class="podium-name">KwameAdu</div><div class="podium-pts">1710</div><div class="podium-block"></div></div>
+      <div class="podium-item p1"><div class="crown">👑</div><div class="podium-avatar" style="border-color:#FFD700;background:rgba(255,215,0,0.1);width:62px;height:62px">ZL</div><div class="podium-name">ZhuLiang99</div><div class="podium-pts">1840</div><div class="podium-block"></div></div>
+      <div class="podium-item p3"><div class="podium-avatar" style="border-color:#CD7F32;background:rgba(205,127,50,0.1)">IH</div><div class="podium-name">IngridH</div><div class="podium-pts">1555</div><div class="podium-block"></div></div>
+    </div>
+    <div class="lb-filter">
+      <div class="lb-tab active" onclick="setLbTab('global',this)">🌍 Global</div>
+      <div class="lb-tab" onclick="setLbTab('national',this)">National</div>
+    </div>
+    <div class="lb-card" id="lb-list"></div>
+    <div style="font-size:11px;font-weight:700;color:var(--muted);text-align:center;padding:8px 0">Rankings update monthly · Next reset in 19 days</div>
+  </div>
+
+  <!-- BROWSE -->
+  <div class="page" id="page-browse">
+    <div class="topbar">
+      <div class="logo-text">Quest Log</div>
+      <button class="btn btn-primary" style="padding:8px 14px;font-size:12px;box-shadow:0 3px 0 var(--gold-dk)" onclick="openAddQuestModal()">✨ Add Quest</button>
+    </div>
+    <input class="search-bar" placeholder="🔍  Search quests…" oninput="searchBrowse(this.value)" id="search-input">
+    <div class="diff-grid" style="margin-bottom:14px">
+      <div class="diff-card easy selected" onclick="filterBrowse('easy',this)" id="bf-easy"><div class="diff-emoji">🌱</div><div class="diff-name easy">Easy</div></div>
+      <div class="diff-card inter" onclick="filterBrowse('inter',this)" id="bf-inter"><div class="diff-emoji">⚡</div><div class="diff-name inter">Inter</div></div>
+      <div class="diff-card hard" onclick="filterBrowse('hard',this)" id="bf-hard"><div class="diff-emoji">🔥</div><div class="diff-name hard">Hard</div></div>
+      <div class="diff-card super" onclick="filterBrowse('super',this)" id="bf-super"><div class="diff-emoji">💀</div><div class="diff-name super">Super Hard</div></div>
+    </div>
+    <div id="browse-list"></div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="page" id="page-profile">
+    <div class="topbar"><div class="logo-text">Profile</div><button class="btn btn-secondary" style="padding:8px 14px;font-size:12px;box-shadow:none" onclick="doLogout()">Log Out</button></div>
+    <div style="text-align:center;padding:20px 0 24px">
+      <div class="profile-avatar-lg" id="profile-avatar-display">🧑</div>
+      <div style="font-size:22px;font-weight:900;margin-bottom:4px" id="profile-name-display">Adventurer</div>
+      <div style="font-size:12px;font-weight:700;color:var(--muted)" id="profile-meta-display">Joined today · Level 1</div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-card"><div class="stat-num" style="color:var(--gold)" id="stat-pts">0</div><div class="stat-lbl">Points</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--easy)" id="stat-quests">0</div><div class="stat-lbl">Quests</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:#FF8C00" id="stat-streak">0</div><div class="stat-lbl">Streak</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--inter)" id="stat-easy">0</div><div class="stat-lbl">Easy</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--hard)" id="stat-inter">0</div><div class="stat-lbl">Inter</div></div>
+      <div class="stat-card"><div class="stat-num" style="color:var(--super)" id="stat-hard">0</div><div class="stat-lbl">Hard+</div></div>
+    </div>
+
+    <!-- NOTIFICATIONS SETTINGS -->
+    <div class="settings-section">
+      <div class="settings-title">Notifications</div>
+      <div class="notif-toggle" onclick="toggleNotif('push')">
+        <div class="notif-toggle-info">
+          <div class="notif-toggle-title">📱 Push Notifications</div>
+          <div class="notif-toggle-sub" id="push-status-text">Daily quests, streaks, rankings</div>
+        </div>
+        <div class="toggle-switch" id="push-toggle"><div class="toggle-knob"></div></div>
+      </div>
+      <div class="notif-toggle" onclick="toggleNotif('email')">
+        <div class="notif-toggle-info">
+          <div class="notif-toggle-title">📧 Email Notifications</div>
+          <div class="notif-toggle-sub" id="email-status-text" id="email-notif-sub">Weekly summary + streak alerts</div>
+        </div>
+        <div class="toggle-switch" id="email-toggle"><div class="toggle-knob"></div></div>
+      </div>
+      <div id="notif-email-row" class="hidden" style="margin-top:8px">
+        <input class="auth-input" id="profile-email-input" type="email" placeholder="Enter email for notifications" style="width:100%;margin-bottom:8px">
+        <button class="btn btn-primary btn-full" onclick="saveEmailNotif()">Save Email</button>
+      </div>
+    </div>
+
+    <div class="settings-section">
+      <div class="settings-title">Account</div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:4px 8px">
+        <div class="settings-row"><div class="settings-icon">👤</div><div class="settings-info"><div class="settings-label" id="account-username">—</div><div class="settings-sub">Username</div></div></div>
+        <div class="settings-row"><div class="settings-icon">📧</div><div class="settings-info"><div class="settings-label" id="account-email">—</div><div class="settings-sub">Email</div></div></div>
+        <div class="settings-row"><div class="settings-icon">🌍</div><div class="settings-info"><div class="settings-label" id="account-country">—</div><div class="settings-sub">Country</div></div></div>
+        <div class="settings-row" style="border:none"><div class="settings-icon">📅</div><div class="settings-info"><div class="settings-label" id="account-joined">—</div><div class="settings-sub">Member since</div></div></div>
+      </div>
+    </div>
+
+    <div class="section-hd"><h2>Quest History</h2></div>
+    <div id="hist-list"></div>
+  </div>
+
+  <div class="bottom-nav">
+    <div class="nav-item active" onclick="goPage('home',this)"><span class="nav-icon">⚔️</span><span class="nav-label">Quest</span></div>
+    <div class="nav-item" onclick="goPage('rank',this)"><span class="nav-icon">🏆</span><span class="nav-label">Ranks</span></div>
+    <div class="nav-item" onclick="goPage('browse',this)"><span class="nav-icon">📜</span><span class="nav-label">Browse</span></div>
+    <div class="nav-item" onclick="goPage('profile',this)"><span class="nav-icon">👤</span><span class="nav-label">Profile</span></div>
+  </div>
+</div>
+
+<!-- ADD QUEST MODAL -->
+<div class="modal-overlay hidden" id="quest-modal" onclick="maybeCloseModal(event)">
+  <div class="modal-sheet" id="modal-sheet">
+    <div class="modal-handle"></div>
+    <div id="modal-step-1">
+      <div style="font-size:20px;font-weight:900;margin-bottom:6px">✨ Create a Quest</div>
+      <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:18px;line-height:1.5">Describe a real-world challenge. Our AI will evaluate difficulty and assign fair points.</div>
+      <label class="form-label">Quest description</label>
+      <textarea class="form-input" id="quest-input" rows="4" placeholder="e.g. Learn to ride a unicycle and ride 10 meters without falling…" maxlength="300" oninput="document.getElementById('char-count').textContent=this.value.length" style="margin-bottom:4px"></textarea>
+      <div style="text-align:right;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:16px"><span id="char-count">0</span>/300</div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="document.getElementById('quest-modal').classList.add('hidden')">Cancel</button>
+        <button class="btn btn-primary" onclick="evaluateQuest()">🤖 Evaluate!</button>
+      </div>
+    </div>
+    <div id="modal-step-2" class="hidden">
+      <div id="ai-thinking" style="text-align:center;padding:24px 0">
+        <div style="font-size:36px;margin-bottom:12px;animation:spin-pulse 1.5s ease-in-out infinite">🤖</div>
+        <div style="display:flex;justify-content:center;gap:5px;margin-bottom:10px"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>
+        <div style="font-size:14px;font-weight:800;color:var(--gold)" id="ai-label">Evaluating your quest…</div>
+      </div>
+      <div id="ai-result" class="hidden">
+        <div style="font-size:13px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px">Your quest</div>
+        <div style="font-size:15px;font-weight:800;line-height:1.4;margin-bottom:14px" id="ai-quest-text"></div>
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">
+          <div><div style="font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Points</div><div style="font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--gold);line-height:1" id="ai-pts">75</div></div>
+          <div id="ai-diff-pill" style="font-size:12px;font-weight:800;padding:6px 14px;border-radius:99px">Intermediate</div>
+        </div>
+        <div style="background:var(--surface2);border-radius:var(--r-md);padding:12px 14px;font-size:13px;font-weight:700;color:var(--muted);line-height:1.6;margin-bottom:14px" id="ai-reasoning"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px" id="ai-factors"></div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" onclick="document.getElementById('modal-step-2').classList.add('hidden');document.getElementById('modal-step-1').classList.remove('hidden')">✏️ Edit</button>
+          <button class="btn btn-primary" onclick="addQuestToPool()">➕ Add Quest!</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+
+// ── USER STORE (simulates localStorage per-user) ──
+const USERS_DB = {};
+let currentUser = null;
+
+const COUNTRY_FLAGS = {CA:'🇨🇦',US:'🇺🇸',GB:'🇬🇧',AU:'🇦🇺',JP:'🇯🇵',CN:'🇨🇳',KR:'🇰🇷',TH:'🇹🇭',BR:'🇧🇷',MX:'🇲🇽',GH:'🇬🇭',NG:'🇳🇬',NO:'🇳🇴',OTHER:'🌍'};
+const COUNTRY_NAMES = {CA:'Canada',US:'United States',GB:'United Kingdom',AU:'Australia',JP:'Japan',CN:'China',KR:'South Korea',TH:'Thailand',BR:'Brazil',MX:'Mexico',GH:'Ghana',NG:'Nigeria',NO:'Norway',OTHER:'Other'};
+
+function createUser(name, email, country){
+  return {
+    name, email, country,
+    pts:0, streak:0, totalQuests:0,
+    easyCount:0, interCount:0, hardCount:0, superCount:0,
+    history:[],
+    joinedDate: new Date().toLocaleDateString('en-US',{month:'short',year:'numeric'}),
+    pushNotif:false, emailNotif:false, notifEmail:'',
+    isNew:true
+  };
+}
+
+// ── DEMO EXISTING ACCOUNT ──
+USERS_DB['demo@sidequest.app'] = {
+  name:'QuestMaster', email:'demo@sidequest.app', country:'CA',
+  pts:340, streak:7, totalQuests:22,
+  easyCount:12, interCount:7, hardCount:3, superCount:0,
+  history:[
+    {text:"Scream in subway car",pts:60,diff:"inter",emoji:"📣",bonus:true,date:"Mar 11"},
+    {text:"Cook a new meal from scratch",pts:18,diff:"easy",emoji:"🍳",bonus:false,date:"Mar 10"},
+    {text:"Meditate 15 minutes",pts:10,diff:"easy",emoji:"🧘",bonus:false,date:"Mar 9"},
+    {text:"Swim butterfly stroke",pts:70,diff:"inter",emoji:"🏊",bonus:true,date:"Mar 8"},
+    {text:"Write and mail a letter",pts:10,diff:"easy",emoji:"✉️",bonus:false,date:"Mar 7"},
+  ],
+  joinedDate:'Jan 2026', pushNotif:true, emailNotif:false, notifEmail:'',
+  isNew:false
+};
+
+// ── AUTH ──
+function switchAuthTab(tab, el){
+  document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('login-form').classList.toggle('hidden', tab!=='login');
+  document.getElementById('signup-form').classList.toggle('hidden', tab!=='signup');
+}
+
+function doLogin(){
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  errEl.classList.remove('visible');
+  if(!email || !pass){errEl.textContent='Please fill in all fields.';errEl.classList.add('visible');return;}
+  // Check DB
+  if(USERS_DB[email]){
+    currentUser = USERS_DB[email];
+    showApp();
+  } else {
+    errEl.textContent='No account found with that email. Sign up instead?';
+    errEl.classList.add('visible');
+  }
+}
+
+function doSignup(){
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const pass = document.getElementById('signup-pass').value;
+  const country = document.getElementById('signup-country').value;
+  const errEl = document.getElementById('signup-error');
+  errEl.classList.remove('visible');
+  if(!name||!email||!pass||!country){errEl.textContent='Please fill in all fields.';errEl.classList.add('visible');return;}
+  if(pass.length<8){errEl.textContent='Password must be at least 8 characters.';errEl.classList.add('visible');return;}
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){errEl.textContent='Please enter a valid email address.';errEl.classList.add('visible');return;}
+  if(USERS_DB[email]){errEl.textContent='An account with this email already exists. Log in instead?';errEl.classList.add('visible');return;}
+  currentUser = createUser(name, email, country);
+  USERS_DB[email] = currentUser;
+  // Show notif screen for new users
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('notif-screen').classList.remove('hidden');
+}
+
+function doGoogleAuth(){
+  // Simulate Google auth — create/load a demo Google account
+  const googleEmail = 'google@sidequest.app';
+  if(!USERS_DB[googleEmail]){
+    USERS_DB[googleEmail] = createUser('GoogleUser', googleEmail, 'US');
+  }
+  currentUser = USERS_DB[googleEmail];
+  if(currentUser.isNew){
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('notif-screen').classList.remove('hidden');
+  } else {
+    showApp();
+  }
+}
+
+function doLogout(){
+  currentUser = null;
+  document.getElementById('app-screen').classList.add('hidden');
+  document.getElementById('auth-screen').classList.remove('hidden');
+  document.getElementById('login-email').value='';
+  document.getElementById('login-pass').value='';
+  document.getElementById('login-error').classList.remove('visible');
+  switchAuthTab('login', document.querySelector('.auth-tab'));
+}
+
+// ── NOTIFICATIONS ──
+async function enableNotifications(){
+  const emailVal = document.getElementById('notif-email').value.trim();
+  if(emailVal) { currentUser.notifEmail = emailVal; currentUser.emailNotif = true; }
+  // Request browser push permission
+  if('Notification' in window){
+    try{
+      const perm = await Notification.requestPermission();
+      currentUser.pushNotif = perm === 'granted';
+    } catch(e){ currentUser.pushNotif = false; }
+  }
+  currentUser.isNew = false;
+  showApp();
+}
+
+function skipNotifications(){
+  currentUser.isNew = false;
+  showApp();
+}
+
+function showApp(){
+  document.getElementById('auth-screen').classList.add('hidden');
+  document.getElementById('notif-screen').classList.add('hidden');
+  document.getElementById('app-screen').classList.remove('hidden');
+  loadUserState();
+}
+
+function loadUserState(){
+  const u = currentUser;
+  // Update topbar
+  document.getElementById('hd-streak').textContent = u.streak;
+  document.getElementById('hd-pts').textContent = u.pts;
+  const level = Math.max(1, Math.floor(u.pts/100)+1);
+  document.getElementById('hd-level').textContent = level;
+  document.getElementById('xp-level').textContent = level;
+  document.getElementById('xp-cur').textContent = u.pts;
+  document.getElementById('xp-next').textContent = level * 100;
+  document.getElementById('xp-bar').style.width = Math.min(100,(u.pts % 100))+'%';
+  // Streak card
+  document.getElementById('streak-num').textContent = u.streak;
+  document.getElementById('streak-fire-icon').style.opacity = u.streak > 0 ? '1' : '0.2';
+  renderStreakDays(u.streak);
+  // New user banner
+  document.getElementById('new-user-banner').classList.toggle('hidden', u.totalQuests > 0);
+  // Profile
+  document.getElementById('profile-name-display').textContent = u.name;
+  document.getElementById('profile-meta-display').textContent = `Joined ${u.joinedDate} · Level ${level}`;
+  document.getElementById('stat-pts').textContent = u.pts;
+  document.getElementById('stat-quests').textContent = u.totalQuests;
+  document.getElementById('stat-streak').textContent = u.streak;
+  document.getElementById('stat-easy').textContent = u.easyCount;
+  document.getElementById('stat-inter').textContent = u.interCount;
+  document.getElementById('stat-hard').textContent = u.hardCount + u.superCount;
+  document.getElementById('account-username').textContent = u.name;
+  document.getElementById('account-email').textContent = u.email;
+  document.getElementById('account-country').textContent = (COUNTRY_FLAGS[u.country]||'🌍')+' '+(COUNTRY_NAMES[u.country]||u.country);
+  document.getElementById('account-joined').textContent = u.joinedDate;
+  // Notification toggles
+  const pt = document.getElementById('push-toggle');
+  const et = document.getElementById('email-toggle');
+  pt.classList.toggle('on', u.pushNotif);
+  et.classList.toggle('on', u.emailNotif);
+  document.getElementById('push-status-text').textContent = u.pushNotif ? 'Enabled — daily quests, streaks, rankings' : 'Daily quests, streaks, rankings';
+  document.getElementById('email-status-text').textContent = u.emailNotif ? `Sending to ${u.notifEmail||u.email}` : 'Weekly summary + streak alerts';
+  // Leaderboard — inject user
+  renderLeaderboard('global');
+  // History
+  renderHistory();
+  // Browse
+  filterBrowse('easy', document.getElementById('bf-easy'));
+}
+
+function renderStreakDays(streak){
+  let html='';
+  for(let i=0;i<7;i++){
+    if(i<streak-1) html+='<div class="streak-day done"></div>';
+    else if(i===streak-1&&streak>0) html+='<div class="streak-day today"></div>';
+    else html+='<div class="streak-day"></div>';
+  }
+  document.getElementById('streak-days').innerHTML=html;
+}
+
+// ── NOTIFICATION TOGGLES ──
+async function toggleNotif(type){
+  const u = currentUser;
+  if(type==='push'){
+    if(!u.pushNotif){
+      if('Notification' in window){
+        const perm = await Notification.requestPermission();
+        u.pushNotif = perm==='granted';
+        if(perm==='granted'){
+          showToast('🔔 Push notifications enabled!');
+          // Schedule a demo notification
+          setTimeout(()=>{
+            if(Notification.permission==='granted'){
+              new Notification('SideQuest ⚔️',{body:"Don't forget today's quest! Your streak is waiting 🔥",icon:''});
+            }
+          },3000);
+        } else {
+          showToast('⚠️ Permission denied — enable in browser settings');
+        }
+      } else {
+        showToast('Push notifications not supported in this browser');
+      }
+    } else {
+      u.pushNotif = false;
+      showToast('Push notifications disabled');
+    }
+    document.getElementById('push-toggle').classList.toggle('on', u.pushNotif);
+    document.getElementById('push-status-text').textContent = u.pushNotif ? 'Enabled — daily quests, streaks, rankings' : 'Daily quests, streaks, rankings';
+  } else {
+    if(!u.emailNotif){
+      document.getElementById('notif-email-row').classList.remove('hidden');
+      document.getElementById('profile-email-input').value = u.notifEmail||u.email;
+    } else {
+      u.emailNotif = false;
+      document.getElementById('notif-email-row').classList.add('hidden');
+      document.getElementById('email-toggle').classList.remove('on');
+      document.getElementById('email-status-text').textContent = 'Weekly summary + streak alerts';
+      showToast('Email notifications disabled');
+    }
+  }
+}
+
+function saveEmailNotif(){
+  const email = document.getElementById('profile-email-input').value.trim();
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){showToast('⚠️ Please enter a valid email');return;}
+  currentUser.emailNotif = true;
+  currentUser.notifEmail = email;
+  document.getElementById('email-toggle').classList.add('on');
+  document.getElementById('email-status-text').textContent = `Sending to ${email}`;
+  document.getElementById('notif-email-row').classList.add('hidden');
+  showToast('📧 Email notifications enabled!');
+}
+
+// ── NAVIGATION ──
+function goPage(pg,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+pg).classList.add('active');
+  el.classList.add('active');
+}
+
+// ── QUEST DATA ──
+const QUESTS = {
+  easy:[
+    {text:"Visit a friend you haven't seen in over a month",pts:15,emoji:"🤝"},
+    {text:"Learn 10 words in a language you've never studied",pts:12,emoji:"🗣️"},
+    {text:"Cook a full meal you've never made before — from scratch",pts:18,emoji:"🍳"},
+    {text:"Write a handwritten letter and actually mail it",pts:10,emoji:"✉️"},
+    {text:"Take a 45-minute walk on a street you've never been on",pts:8,emoji:"🚶"},
+    {text:"Score >80% on any online quiz or practice exam",pts:25,emoji:"📝"},
+    {text:"Meditate for 15 full minutes without stopping",pts:10,emoji:"🧘"},
+    {text:"Learn to juggle 3 objects — 10 consecutive catches",pts:20,emoji:"🤹"},
+    {text:"Wake up before 6am and watch the sunrise",pts:12,emoji:"🌅"},
+    {text:"Read 50 pages of a non-fiction book in one sitting",pts:14,emoji:"📖"},
+    {text:"Do 100 push-ups total throughout the day",pts:16,emoji:"💪"},
+    {text:"Try a food you've always been scared to eat",pts:10,emoji:"🍽️"},
+    {text:"Have a 30-minute conversation in a second language",pts:22,emoji:"💬"},
+    {text:"Go one full day without social media",pts:15,emoji:"📵"},
+    {text:"Memorize and recite a poem or song from memory",pts:13,emoji:"🎤"},
+    {text:"Compliment 10 strangers genuinely throughout the day",pts:12,emoji:"💛"},
+    {text:"Do a 5km run without stopping — any pace",pts:18,emoji:"🏃"},
+    {text:"Learn to play one song on any instrument",pts:20,emoji:"🎵"},
+    {text:"Donate something meaningful to a charity or person in need",pts:15,emoji:"❤️"},
+    {text:"Try a 10-minute cold shower — no warm water at all",pts:14,emoji:"🚿"},
+    {text:"Draw a self-portrait from scratch — no erasing",pts:11,emoji:"🎨"},
+    {text:"Attend a local community event or neighbourhood meetup",pts:16,emoji:"🏘️"},
+    {text:"Cook and meal-prep food for your entire week",pts:22,emoji:"🥗"},
+    {text:"Do 30 minutes of yoga following a full class video",pts:12,emoji:"🧘"},
+    {text:"Call a family member you haven't spoken to in months",pts:10,emoji:"📞"},
+  ],
+  inter:[
+    {text:"Scream at the top of your lungs for 1 full minute in a subway car",pts:55,emoji:"📣"},
+    {text:"Strike up a real conversation with 5 complete strangers in one day",pts:40,emoji:"💬"},
+    {text:"Film a short movie scene inside a Costco without getting kicked out",pts:65,emoji:"🎬"},
+    {text:"Learn to swim butterfly stroke — complete one full lap",pts:70,emoji:"🏊"},
+    {text:"Attend an improv comedy class and perform in front of the group",pts:60,emoji:"🎭"},
+    {text:"Order an entire meal in a language you barely know",pts:35,emoji:"🍜"},
+    {text:"Go 24 full hours without touching your phone",pts:50,emoji:"📵"},
+    {text:"Perform a random act of kindness that costs you over $20",pts:35,emoji:"💛"},
+    {text:"Spend a full day completely alone — no texts, no calls, no people",pts:45,emoji:"🌲"},
+    {text:"Bake a full layered cake from scratch and gift it to someone",pts:40,emoji:"🎂"},
+    {text:"Do a polar plunge — jump into a natural body of cold water",pts:55,emoji:"🥶"},
+    {text:"Sing karaoke solo in front of a crowd of strangers",pts:45,emoji:"🎤"},
+    {text:"Negotiate a discount at a store — get at least 10% off",pts:35,emoji:"🤝"},
+    {text:"Sleep under the stars outside with no tent",pts:50,emoji:"🌠"},
+    {text:"Run 10km without stopping",pts:65,emoji:"🏃"},
+    {text:"Learn and perform a viral dance in a public place",pts:42,emoji:"💃"},
+    {text:"Interview a stranger about their life story for 10+ minutes",pts:40,emoji:"🎙️"},
+    {text:"Go to a restaurant alone, sit at the bar, and make friends",pts:38,emoji:"🍻"},
+    {text:"Complete a full day of intermittent fasting — 16 hours minimum",pts:35,emoji:"⏱️"},
+    {text:"Take a spontaneous day trip to a town you've never visited",pts:55,emoji:"🚂"},
+    {text:"Volunteer at a soup kitchen or food bank for a full shift",pts:50,emoji:"🍲"},
+    {text:"Learn to solve a Rubik's cube — under 5 minutes",pts:60,emoji:"🧩"},
+    {text:"Do a stand-up paddleboard session for the first time",pts:45,emoji:"🏄"},
+    {text:"Attend a religious service different from your own upbringing",pts:40,emoji:"🕌"},
+    {text:"Learn to ride a bike with no hands for 30 consecutive meters",pts:38,emoji:"🚲"},
+  ],
+  hard:[
+    {text:"Learn Muay Thai — attend 3 consecutive training sessions at a real gym",pts:120,emoji:"🥊"},
+    {text:"Run a half-marathon distance (21km) without stopping",pts:140,emoji:"🏃"},
+    {text:"Perform stand-up comedy for 5 minutes in front of a live audience",pts:110,emoji:"🎤"},
+    {text:"Spend 24 hours alone in a city you've never visited before",pts:130,emoji:"🌆"},
+    {text:"Take a proper surfing lesson and catch a real wave on your own",pts:100,emoji:"🏄"},
+    {text:"Beat a chess player rated at least 200 points above you",pts:90,emoji:"♟️"},
+    {text:"Hike to a peak over 1,500m and take a photo at the summit",pts:105,emoji:"⛰️"},
+    {text:"Spend 72 hours with no internet at all — phone off, laptop closed",pts:115,emoji:"🔌"},
+    {text:"Complete a 24-hour charity fundraiser walk or run",pts:140,emoji:"🏅"},
+    {text:"Build and launch a functioning website or app in 48 hours",pts:135,emoji:"💻"},
+    {text:"Complete a 3-day silent meditation retreat",pts:145,emoji:"🙏"},
+    {text:"Compete in an official powerlifting or CrossFit competition",pts:130,emoji:"🏋️"},
+    {text:"Record and release a song on any streaming platform",pts:125,emoji:"🎵"},
+    {text:"Climb a via ferrata route with a full harness kit",pts:120,emoji:"🧗"},
+    {text:"Complete a 30-day no-sugar challenge — start to end",pts:110,emoji:"🚫"},
+    {text:"Write and submit a short story to a literary magazine",pts:100,emoji:"📚"},
+    {text:"Organize a pop-up event or party for 20+ people from scratch",pts:120,emoji:"🎉"},
+    {text:"Go skinny dipping in the ocean — during daytime",pts:85,emoji:"🌊"},
+    {text:"Learn to do a standing backflip with a spotter",pts:130,emoji:"🤸"},
+    {text:"Complete a full triathlon distance in training — swim/bike/run",pts:140,emoji:"🏊"},
+  ],
+  super:[
+    {text:"Travel to China and train Kung Fu under a real master — minimum 3 days",pts:200,emoji:"🥋"},
+    {text:"Climb a mountain over 3,000m without a guide — summit and return",pts:220,emoji:"🏔️"},
+    {text:"Compete in a local martial arts tournament — win at least one match",pts:180,emoji:"🏅"},
+    {text:"Film and release a mini-documentary about a stranger's life story",pts:170,emoji:"🎥"},
+    {text:"Get your motorcycle license — pass the full official riding test",pts:160,emoji:"🏍️"},
+    {text:"Run an official full marathon — 42km — and cross the finish line",pts:210,emoji:"🏁"},
+    {text:"Learn to freedive to 10m depth with a certified instructor",pts:190,emoji:"🤿"},
+    {text:"Travel to Thailand and train Muay Thai for a minimum of 5 days",pts:200,emoji:"🇹🇭"},
+    {text:"Compete in an official triathlon — swim, bike, run — full race",pts:215,emoji:"🏊"},
+    {text:"Live abroad in a foreign country solo for 30 days minimum",pts:250,emoji:"🌍"},
+    {text:"Learn to fly a plane and complete your first solo flight",pts:280,emoji:"✈️"},
+    {text:"Complete a 100km ultramarathon from start to finish",pts:300,emoji:"🦅"},
+    {text:"Summit a peak over 5,000m — acclimatize and complete the climb",pts:280,emoji:"🗻"},
+    {text:"Launch a business and make your first $100 in revenue",pts:195,emoji:"💰"},
+    {text:"Compete in a national-level sport competition of any kind",pts:220,emoji:"🥇"},
+    {text:"Spend 30 days living completely off the grid",pts:280,emoji:"🏕️"},
+    {text:"Learn Capoeira and perform a full roda in Brazil",pts:230,emoji:"🤸"},
+    {text:"Complete an ice climbing course and summit a frozen waterfall",pts:240,emoji:"🧊"},
+  ]
+};
+
+let communityQuests = [];
+let browseDiff = 'easy';
+let questState = {diff:null,quest:null,rerolls:0};
+
+const LEADERBOARD_DATA = {
+  global:[
+    {name:"ZhuLiang99",country:"🇨🇳 CN",pts:1840,avatar:"ZL",color:"#E85050"},
+    {name:"KwameAdu",country:"🇬🇭 GH",pts:1710,avatar:"KA",color:"#4CAF79"},
+    {name:"IngridHansen",country:"🇳🇴 NO",pts:1555,avatar:"IH",color:"#4A9EE8"},
+    {name:"RafaelMtz",country:"🇲🇽 MX",pts:1490,avatar:"RM",color:"#E8844A"},
+    {name:"SakuraN",country:"🇯🇵 JP",pts:1240,avatar:"SN",color:"#C84E8A"},
+    {name:"OkonkwoB",country:"🇳🇬 NG",pts:1100,avatar:"OB",color:"#E8B84B"},
+  ],
+  national:{
+    CA:[{name:"PriyaS",country:"🇨🇦 Toronto",pts:820,avatar:"PS",color:"#4CAF79"},{name:"TomF",country:"🇨🇦 Vancouver",pts:690,avatar:"TF",color:"#4A9EE8"},{name:"NikkiB",country:"🇨🇦 Montreal",pts:510,avatar:"NB",color:"#C84E8A"},{name:"Alex_TO",country:"🇨🇦 Toronto",pts:280,avatar:"AT",color:"#E8844A"}],
+    US:[{name:"ChaseR",country:"🇺🇸 NYC",pts:920,avatar:"CR",color:"#E85050"},{name:"Maya_K",country:"🇺🇸 LA",pts:770,avatar:"MK",color:"#4A9EE8"}],
+    DEFAULT:[{name:"NoPlayersYet",country:"Your country",pts:0,avatar:"?",color:"var(--muted)"}]
+  }
+};
+
+function renderLeaderboard(type){
+  const u = currentUser;
+  let rows;
+  if(type==='global'){
+    rows = [...LEADERBOARD_DATA.global];
+    // Insert user in right position
+    const me = {name:u.name+' 👈',country:(COUNTRY_FLAGS[u.country]||'🌍')+' '+u.country,pts:u.pts,avatar:u.name.substring(0,2).toUpperCase(),color:'var(--gold)',isMe:true};
+    rows.push(me);
+    rows.sort((a,b)=>b.pts-a.pts);
+  } else {
+    rows = [...(LEADERBOARD_DATA.national[u.country]||LEADERBOARD_DATA.national.DEFAULT)];
+    const me = {name:u.name+' 👈',country:(COUNTRY_FLAGS[u.country]||'🌍')+' '+COUNTRY_NAMES[u.country],pts:u.pts,avatar:u.name.substring(0,2).toUpperCase(),color:'var(--gold)',isMe:true};
+    rows.push(me);
+    rows.sort((a,b)=>b.pts-a.pts);
+  }
+  const rankCls=['r1','r2','r3'];
+  document.getElementById('lb-list').innerHTML=rows.map((r,i)=>`
+    <div class="lb-row ${r.isMe?'me':''}">
+      <div class="lb-rank ${rankCls[i]||''}">${i+1}</div>
+      <div class="lb-avatar" style="background:rgba(0,0,0,0.2);border-color:${r.color};color:${r.color}">${r.avatar}</div>
+      <div class="lb-info"><div class="lb-name">${r.name}</div><div class="lb-meta">${r.country}</div></div>
+      <div class="lb-score">${r.pts}</div>
+    </div>`).join('');
+}
+
+function setLbTab(type,el){
+  document.querySelectorAll('.lb-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  // Update national tab label
+  if(type==='national' && currentUser) el.textContent = (COUNTRY_FLAGS[currentUser.country]||'🌍')+' National';
+  renderLeaderboard(type);
+}
+
+// ── QUEST FLOW ──
+function selectDiff(d){
+  questState.diff=d; questState.rerolls=0;
+  ['easy','inter','hard','super'].forEach(x=>document.getElementById('dc-'+x).classList.toggle('selected',x===d));
+  pickQuest();
+  const qa=document.getElementById('quest-area');
+  qa.classList.remove('hidden'); qa.classList.remove('slide-up'); void qa.offsetWidth; qa.classList.add('slide-up');
+  document.getElementById('submit-area').classList.add('hidden');
+  document.getElementById('complete-area').classList.add('hidden');
+  document.getElementById('new-user-banner').classList.add('hidden');
+}
+
+function pickQuest(){
+  const pool=[...QUESTS[questState.diff],...communityQuests.filter(q=>q.diff===questState.diff)];
+  questState.quest=pool[Math.floor(Math.random()*pool.length)];
+  const diffLabel={easy:'Easy',inter:'Intermediate',hard:'Hard',super:'Super Hard'};
+  const card=document.getElementById('quest-card');
+  card.className='quest-card-main '+questState.diff;
+  document.getElementById('qc-badge').className='qc-badge '+questState.diff;
+  document.getElementById('qc-badge').textContent=diffLabel[questState.diff];
+  document.getElementById('qc-text').textContent=questState.quest.emoji+' '+questState.quest.text;
+  document.getElementById('qc-pts').textContent='+'+questState.quest.pts+' pts';
+  updateHearts();
+}
+
+function updateHearts(){
+  for(let i=0;i<3;i++){
+    const h=document.getElementById('h'+i);
+    if(i<questState.rerolls&&questState.rerolls<=3){h.classList.add('gone');h.textContent='🖤';}
+    else{h.classList.remove('gone');h.textContent='❤️';}
+  }
+  const info=document.getElementById('reroll-info');
+  const btn=document.getElementById('btn-reroll');
+  if(questState.rerolls>=3){info.textContent='Extra rerolls cost −5 pts each';btn.textContent='💸 Reroll (−5 pts)';}
+  else{info.textContent=(3-questState.rerolls)+' free reroll'+(3-questState.rerolls!==1?'s':'')+' left';btn.textContent='🔀 Reroll';}
+}
+
+function doReroll(){
+  if(questState.rerolls>=3){
+    currentUser.pts=Math.max(0,currentUser.pts-5);
+    updateTopStats();
+    document.getElementById('quest-card').classList.add('shake');
+    setTimeout(()=>document.getElementById('quest-card').classList.remove('shake'),400);
+  }
+  questState.rerolls++;
+  pickQuest();
+}
+
+function acceptQuest(){
+  document.getElementById('quest-area').classList.add('hidden');
+  const sa=document.getElementById('submit-area');
+  sa.classList.remove('hidden','slide-up'); void sa.offsetWidth; sa.classList.add('slide-up');
+  document.getElementById('submit-quest-text').textContent=questState.quest.emoji+' '+questState.quest.text;
+}
+
+function submitProof(type){
+  const bonus=type==='video'?5:0;
+  const earned=questState.quest.pts+bonus;
+  const u=currentUser;
+  u.pts+=earned; u.streak++; u.totalQuests++;
+  if(questState.diff==='easy')u.easyCount++;
+  else if(questState.diff==='inter')u.interCount++;
+  else if(questState.diff==='hard')u.hardCount++;
+  else u.superCount++;
+  u.history.unshift({text:questState.quest.text,pts:earned,diff:questState.diff,emoji:questState.quest.emoji,bonus:type==='video',date:'Today'});
+  document.getElementById('submit-area').classList.add('hidden');
+  document.getElementById('complete-area').classList.remove('hidden');
+  document.getElementById('earned-pts').textContent='+'+earned;
+  document.getElementById('bd-base').textContent='+'+questState.quest.pts;
+  document.getElementById('bd-bonus-row').style.display=bonus?'':'none';
+  updateTopStats();
+  updateProfileStats();
+}
+
+function resetQuest(){
+  questState.diff=null;questState.quest=null;questState.rerolls=0;
+  ['easy','inter','hard','super'].forEach(x=>document.getElementById('dc-'+x).classList.remove('selected'));
+  document.getElementById('quest-area').classList.add('hidden');
+  document.getElementById('complete-area').classList.add('hidden');
+}
+
+function updateTopStats(){
+  const u=currentUser;
+  document.getElementById('hd-pts').textContent=u.pts;
+  document.getElementById('hd-streak').textContent=u.streak;
+  const level=Math.max(1,Math.floor(u.pts/100)+1);
+  document.getElementById('hd-level').textContent=level;
+  document.getElementById('xp-level').textContent=level;
+  document.getElementById('xp-cur').textContent=u.pts;
+  document.getElementById('xp-bar').style.width=Math.min(100,(u.pts%100))+'%';
+  document.getElementById('streak-num').textContent=u.streak;
+  document.getElementById('streak-fire-icon').style.opacity=u.streak>0?'1':'0.2';
+  renderStreakDays(u.streak);
+}
+
+function updateProfileStats(){
+  const u=currentUser;
+  document.getElementById('stat-pts').textContent=u.pts;
+  document.getElementById('stat-quests').textContent=u.totalQuests;
+  document.getElementById('stat-streak').textContent=u.streak;
+  document.getElementById('stat-easy').textContent=u.easyCount;
+  document.getElementById('stat-inter').textContent=u.interCount;
+  document.getElementById('stat-hard').textContent=u.hardCount+u.superCount;
+  renderHistory();
+}
+
+function renderHistory(){
+  const u=currentUser;
+  const diffLabel={easy:'Easy',inter:'Intermediate',hard:'Hard',super:'Super Hard'};
+  if(u.history.length===0){
+    document.getElementById('hist-list').innerHTML=`<div class="empty-state"><div class="empty-icon">📜</div><div class="empty-title">No quests yet</div><div class="empty-sub">Complete your first quest and it will appear here. Every adventure starts with one bold step!</div></div>`;
+    return;
+  }
+  document.getElementById('hist-list').innerHTML=u.history.map(h=>`
+    <div class="hist-item">
+      <div class="hist-icon">${h.emoji}</div>
+      <div style="flex:1"><div class="hist-text">${h.text}</div>
+        <div class="hist-meta"><span class="tag tag-${h.diff}">${diffLabel[h.diff]}</span>${h.bonus?'<span style="font-size:11px;color:var(--gold);font-weight:800;margin-left:6px">+5 video 🎬</span>':''}
+        <span style="font-size:11px;color:var(--muted2);font-weight:600;margin-left:6px">${h.date}</span></div>
+      </div>
+      <div class="hist-pts">+${h.pts}</div>
+    </div>`).join('');
+}
+
+// ── BROWSE ──
+function filterBrowse(diff,el){
+  browseDiff=diff;
+  document.querySelectorAll('[id^="bf-"]').forEach(e=>e.classList.remove('selected'));
+  el.classList.add('selected');
+  if(document.getElementById('search-input')) document.getElementById('search-input').value='';
+  renderBrowseList(diff,'');
+}
+
+function searchBrowse(val){ renderBrowseList(browseDiff,val.toLowerCase()); }
+
+function renderBrowseList(diff,search){
+  const diffLabel={easy:'Easy',inter:'Intermediate',hard:'Hard',super:'Super Hard'};
+  const allQ=[...QUESTS[diff],...communityQuests.filter(q=>q.diff===diff)];
+  const filtered=search?allQ.filter(q=>q.text.toLowerCase().includes(search)):allQ;
+  document.getElementById('browse-list').innerHTML=filtered.length===0
+    ?`<div style="text-align:center;padding:30px;color:var(--muted);font-weight:700">No quests found 🔍</div>`
+    :filtered.map(q=>`<div class="hist-item"><div class="hist-icon">${q.emoji}</div><div style="flex:1"><div class="hist-text">${q.text}</div><div class="hist-meta"><span class="tag tag-${diff}">${diffLabel[diff]}</span>${q.community?'<span class="community-badge">✨ Community</span>':''}</div></div><div class="hist-pts">+${q.pts}</div></div>`).join('');
+}
+
+// ── ADD QUEST MODAL ──
+function openAddQuestModal(){
+  document.getElementById('quest-modal').classList.remove('hidden');
+  document.getElementById('modal-step-1').classList.remove('hidden');
+  document.getElementById('modal-step-2').classList.add('hidden');
+  document.getElementById('quest-input').value='';
+  document.getElementById('char-count').textContent='0';
+}
+
+function maybeCloseModal(e){ if(e.target.id==='quest-modal') document.getElementById('quest-modal').classList.add('hidden'); }
+
+async function evaluateQuest(){
+  const txt=document.getElementById('quest-input').value.trim();
+  if(txt.length<10){ document.getElementById('quest-input').style.borderColor='var(--red)'; setTimeout(()=>document.getElementById('quest-input').style.borderColor='',1000); return; }
+  document.getElementById('modal-step-1').classList.add('hidden');
+  document.getElementById('modal-step-2').classList.remove('hidden');
+  document.getElementById('ai-thinking').style.display='block';
+  document.getElementById('ai-result').classList.add('hidden');
+  const msgs=["Evaluating your quest…","Analyzing difficulty factors…","Calculating effort required…","Assigning point value…"];
+  let mi=0; const iv=setInterval(()=>{mi=(mi+1)%msgs.length;document.getElementById('ai-label').textContent=msgs[mi];},1200);
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:800,system:`You are the SideQuest difficulty evaluator. Respond ONLY with valid JSON:\n{"points":<1-300>,"difficulty":"easy"|"inter"|"hard"|"super","reasoning":"<2 sentences, fun and encouraging>","factors":{"physical":<0-100>,"social":<0-100>,"time":<0-100>,"cost":<0-100>},"emoji":"<single emoji>","cleanTitle":"<under 80 chars>"}`,messages:[{role:"user",content:`Evaluate: "${txt}"`}]})});
+    clearInterval(iv);
+    const data=await res.json();
+    const result=JSON.parse(data.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim());
+    showAIResult(txt,result);
+  } catch(e){ clearInterval(iv); showAIResult(txt,localEval(txt)); }
+}
+
+function localEval(text){
+  const t=text.toLowerCase();let pts=12;
+  ['run','climb','swim','hike','marathon','lift','dive'].forEach(w=>{if(t.includes(w))pts+=10;});
+  ['stranger','public','perform','stage','scream','karaoke'].forEach(w=>{if(t.includes(w))pts+=12;});
+  ['travel','china','thailand','abroad','international'].forEach(w=>{if(t.includes(w))pts+=35;});
+  ['month','tournament','compete','license'].forEach(w=>{if(t.includes(w))pts+=22;});
+  pts=Math.min(280,Math.max(8,pts));
+  const diff=pts<=30?'easy':pts<=75?'inter':pts<=150?'hard':'super';
+  return{points:pts,difficulty:diff,reasoning:`This quest earns ${pts} points for its real-world challenge level. Push yourself and make it happen!`,factors:{physical:Math.min(100,pts/3+10),social:Math.min(100,pts/4+10),time:Math.min(100,pts/3),cost:Math.min(100,pts/5+5)},emoji:'⚔️',cleanTitle:text.length>80?text.slice(0,77)+'…':text};
+}
+
+function showAIResult(original,r){
+  document.getElementById('ai-thinking').style.display='none';
+  document.getElementById('ai-result').classList.remove('hidden');
+  document.getElementById('ai-quest-text').textContent=(r.emoji||'⚔️')+' '+(r.cleanTitle||original);
+  document.getElementById('ai-pts').textContent='+'+r.points;
+  const dc={easy:'var(--easy)',inter:'var(--inter)',hard:'var(--hard)',super:'var(--super)'};
+  const db={easy:'var(--easy-bg)',inter:'var(--inter-bg)',hard:'var(--hard-bg)',super:'var(--super-bg)'};
+  const dl={easy:'Easy',inter:'Intermediate',hard:'Hard',super:'Super Hard'};
+  const pill=document.getElementById('ai-diff-pill');
+  pill.textContent=dl[r.difficulty]||'Intermediate';
+  pill.style.background=db[r.difficulty]||db.inter;
+  pill.style.color=dc[r.difficulty]||dc.inter;
+  document.getElementById('ai-reasoning').textContent=r.reasoning||'Great quest idea!';
+  const fc={physical:'#E8844A',social:'#4A9EE8',time:'#4CAF79',cost:'var(--gold)'};
+  const fl={physical:'Physical',social:'Social',time:'Time',cost:'Cost'};
+  const factors=r.factors||{physical:50,social:50,time:50,cost:50};
+  document.getElementById('ai-factors').innerHTML=Object.keys(factors).map(k=>`<div class="ai-factor"><div class="ai-factor-label">${fl[k]}</div><div class="ai-factor-bar"><div class="ai-factor-fill" style="width:${factors[k]}%;background:${fc[k]}"></div></div></div>`).join('');
+  document.getElementById('ai-result').dataset.result=JSON.stringify(r);
+}
+
+function addQuestToPool(){
+  const r=JSON.parse(document.getElementById('ai-result').dataset.result||'{}');
+  communityQuests.push({text:r.cleanTitle||'Community Quest',pts:r.points||50,emoji:r.emoji||'⚔️',diff:r.difficulty||'inter',community:true});
+  document.getElementById('quest-modal').classList.add('hidden');
+  goPage('browse',document.querySelector('.nav-item:nth-child(3)'));
+  filterBrowse(r.difficulty||'inter',document.getElementById('bf-'+(r.difficulty||'inter')));
+  showToast('Quest added to the community pool! ✨');
+}
+
+function showToast(msg){
+  const t=document.createElement('div');
+  t.textContent=msg;
+  t.style.cssText='position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:var(--gold);color:#0C0C0F;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:800;z-index:200;white-space:nowrap;animation:slide-up 0.3s ease;max-width:90vw;text-align:center';
+  document.body.appendChild(t);
+  setTimeout(()=>t.style.opacity='0',2000);
+  setTimeout(()=>t.remove(),2500);
+}
+</script>
+</body>
+</html>
